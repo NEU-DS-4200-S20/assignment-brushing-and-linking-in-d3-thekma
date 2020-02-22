@@ -4,13 +4,108 @@ function table() {
 
   // Based on Mike Bostock's margin convention
   // https://bl.ocks.org/mbostock/3019563
+
+  let margin = {
+    top: 60,
+    left: 50,
+    right: 30,
+    bottom: 35
+  },
+  width = 500 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom,
+  xValue = d => d[0],
+  yValue = d => d[1],
+  xLabelText = "",
+  yLabelText = "",
+  yLabelOffsetPx = 0,
+  xScale = d3.scalePoint(),
+  yScale = d3.scaleLinear(),
+  ourBrush = null,
+  selectableElements = d3.select(null),
+  dispatcher;
+
   let ourBrush = null,
     selectableElements = d3.select(null),
     dispatcher;
 
   // Create the chart by adding an svg to the div with the id 
   // specified by the selector using the given data
+
+    /* global D3 */
+
+  // Based on Mike Bostock's margin convention
+  // https://bl.ocks.org/mbostock/3019563
+
+  // Create the chart by adding an svg to the div with the id 
+  // specified by the selector using the given data
+
+ // --------------------------------------------------------
+
   function chart(selector, data) {
+
+    d3.csv("texas.json", function(data) {
+      d3.select("#example")
+          .datum(data)
+          .call(chart);
+    });
+
+    let svg = d3.select(selector)
+      .append("svg")
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom].join(' '))
+        .classed("svg-content", true);
+
+    svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+    var table = d3.select("body").append("table")
+            .attr("style", "margin-left: 250px"),
+        thead = table.append("thead"),
+        tbody = table.append("tbody");
+
+    // append the header row
+    thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+            .text(function(column) { return column; });
+
+    // create a row for each object in the data
+    var rows = tbody.selectAll("tr")
+        .data(data)
+        .enter()
+        .append("tr");
+
+    // create a cell in each row for each column
+    var cells = rows.selectAll("td")
+        .data(function(row) {
+            return columns.map(function(column) {
+                return {column: column, value: row[column]};
+            });
+        })
+        .enter()
+        .append("td")
+        .attr("style", "font-family: Courier")
+            .html(function(d) { return d.value; });
+    
+    return table;
+}
+
+// render the table
+ var peopleTable = tabulate(data, ["date", "close"]);
+
+ // --------------------------------------------------------
+
+  function chart(selector, data) {
+
+    d3.csv("data/texas.json", function(data) {
+      d3.select("#example")
+          .datum(data)
+          .call(chart);
+        });
+
     let table = d3.select(selector)
       .append("table")
         .classed("my-table", true);
